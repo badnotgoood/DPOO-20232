@@ -18,15 +18,23 @@ public class Restaurante {
 
 	private ArrayList<ProductoMenu> menuBase = new ArrayList<>();
 
+	public Restaurante() throws IOException {
+
+		File archivoIngredientes = new File("./data/ingredientes.txt");
+		File archivoMenu = new File("./data/menu.txt");
+		File archivoCombos = new File("./data/combos.txt");
+		cargarInformacionRestaurante(archivoIngredientes, archivoMenu, archivoCombos);
+	}
+
 	public void inciarPedido(String nombreCliente, String direccionCliente) {
 		Pedido elPedido = new Pedido(nombreCliente, direccionCliente);
 		pedidoEnCurso = elPedido;
-		pedidos.add(elPedido);
+
 	}
 
 	public void cerrarYGuardarPedido() {
+		pedidos.add(elPedido);
 
-		Pedido.guardarFactura();
 	}
 
 	public Pedido getPedidoEnCurso() {
@@ -39,12 +47,24 @@ public class Restaurante {
 		return menuBase;
 	}
 
+	// EDIT
 	public ArrayList<Ingrediente> getIngredientes() {
 
 		return ingredientes;
 	}
 
-	public void cargarInformacionRestuarante(File archivoIngredientes, File archivoMenu, File archivoCombos)
+	// EDIT
+	public ArrayList<Combo> getCombos() {
+
+		return combos;
+	}
+
+	public ArrayList<Ingrediente> getIngredientes() {
+
+		return ingredientes;
+	}
+
+	public void cargarInformacionRestaurante(File archivoIngredientes, File archivoMenu, File archivoCombos)
 			throws IOException {
 
 		cargarMenu(archivoMenu);
@@ -52,8 +72,8 @@ public class Restaurante {
 		cargarCombos(archivoCombos);
 	}
 
-	private void cargarIngredientes(File archivoingredientes) throws IOException {
-		BufferedReader br = new BufferedReader(new FileReader("./data/ingredientes.txt"));
+	private void cargarIngredientes(File archivoIngredientes) throws IOException {
+		BufferedReader br = new BufferedReader(new FileReader(archivoIngredientes));
 		String line = br.readLine();
 
 		line = br.readLine();
@@ -71,7 +91,7 @@ public class Restaurante {
 	}
 
 	private void cargarMenu(File archivoMenu) throws IOException {
-		BufferedReader br = new BufferedReader(new FileReader("./data/menu.txt"));
+		BufferedReader br = new BufferedReader(new FileReader(archivoMenu));
 		String line = br.readLine();
 
 		line = br.readLine();
@@ -88,24 +108,24 @@ public class Restaurante {
 	}
 
 	private void cargarCombos(File archivoCombos) throws IOException {
-		BufferedReader br = new BufferedReader(new FileReader("./data/combos.txt"));
+		BufferedReader br = new BufferedReader(new FileReader(archivoCombos));
 		String line = br.readLine();
 
-		line = br.readLine();
 		while (line != null) {
 			String[] data = line.split(";");
 			String nombreCombo = data[0];
 			double descuento = (Integer.parseInt(data[1].split("%")[0])) / 100;
 			Combo elCombo = new Combo(nombreCombo, descuento);
 
-			for (String nombreProductoCombo : data[2].split(";")) {
+			for (int i = 2; i < data.length; i++) {
+				String nombreProductoCombo = data[i];
 				for (Producto productoBase : menuBase) {
 					String nombreProducto = productoBase.getNombre();
 					if (nombreProducto == nombreProductoCombo) {
 						elCombo.agregarItemACombo(productoBase);
 					}
 				}
-				}
+			}
 			combos.add(elCombo);
 			line = br.readLine();
 		}

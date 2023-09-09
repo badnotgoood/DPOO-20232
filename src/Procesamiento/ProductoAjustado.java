@@ -14,6 +14,16 @@ public class ProductoAjustado implements Producto {
 
 		this.base = base;
 	}
+	
+	//EDIT
+	public void agregarIngrediente(Ingrediente item) {
+		this.agregados.add(item);
+	}
+
+	//EDIT
+	public void eliminarIngrediente(Ingrediente item) {
+		this.eliminados.add(item);
+	}
 
 	@Override
 	public int getPrecio() {
@@ -35,31 +45,50 @@ public class ProductoAjustado implements Producto {
 		StringBuilder factura = new StringBuilder();
 
 		String nombreProducto = getNombre();
-		factura.append(nombreProducto).append("\n");
+		String precioProducto = String.valueOf(getPrecio());
 
-		int maxWidth = 24;
+		String format = "%-35s%-10s\n";
+
+		if (precioProducto.length() == 4) {
+			format = "%-36s%-10s\n";
+		} 
+		else if (precioProducto.length() == 6) {
+			format = "%-34s%-10s\n";
+		}
+
+		factura.append(String.format(format, " 1 " + nombreProducto, precioProducto));
 		
-	    String precioBaseProducto = String.format("$%.2f", base.getPrecio());
-	    String productoln = String.format("%=" + (maxWidth + 3) + "s\n", nombreProducto, precioBaseProducto);
-	    factura.append(productoln);
-
-		if (agregados.isEmpty() != false) {
-			for (Ingrediente ingrediente : agregados) {
-				String nombreIngrediente = "+ " + ingrediente.getNombre();
-				String precioIngrediente = String.format("%30s$%-5.2f\n", "", ingrediente.getCostoAdicional());
-				String ingredienteln = String.format("%=" + (maxWidth + 3) + "s%s", nombreIngrediente, precioIngrediente);
-				factura.append(ingredienteln);
+		if (agregados.isEmpty() == false) { 
+		
+			for (Ingrediente agregado : agregados) { 
+				
+				String formatAgregado = "%-35s%-10s\n";
+						
+				String nombreAgregado = agregado.getNombre();
+				String costoAgregado = String.valueOf(agregado.getCostoAdicional());
+				
+				if (precioProducto.length() == 4) {
+					formatAgregado = "%-36s%-10s\n";
+				}
+				else if (precioProducto.length() == 6) {
+					formatAgregado = "%-34s%-10s\n";
+				}
+				
+				factura.append(String.format(formatAgregado,"    + " + nombreAgregado, costoAgregado));
 			}
 		}
-
-		if (eliminados.isEmpty() != false) {
-			for (Ingrediente ingrediente : eliminados) {
-				String nombreIngrediente = "- " + ingrediente.getNombre();
-				String precioIngrediente = String.format("%30s$0.00\n", "");
-				String ingredienteln = String.format("%-" + (maxWidth + 3) + "s%s", nombreIngrediente, precioIngrediente);
-				factura.append(ingredienteln);
+				
+		
+		if (eliminados.isEmpty() == false) {
+			
+			for (Ingrediente eliminado : eliminados) { 
+				
+				String nombreEliminado = eliminado.getNombre();
+				
+				factura.append(String.format("%-39s%-10s\n","    - " + nombreEliminado,"0"));
 			}
-		}
+		}		
+		
 		return factura.toString();
 	}
 

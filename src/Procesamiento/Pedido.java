@@ -1,9 +1,8 @@
 package Procesamiento;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 public class Pedido {
@@ -56,44 +55,68 @@ public class Pedido {
 
 	private String generarTextoFactura() {
 		    StringBuilder factura = new StringBuilder();
-
-		    // Header
-		    factura.append("======================================\n");
-		    factura.append("Orden #: ").append(idPedido).append("\n");
-		    factura.append("Cliente: ").append(nombreCliente).append("\n");
-		    factura.append("Dirección: ").append(direccionCliente).append("\n");
-		    factura.append("======================================\n");
 		    
-		    int centro = (24 - (">>ORDER<<".length())) / 2;
-		    factura.append(String.format("%" + (">>PEDIDO<<".length() + centro) + "s", ">>PEDIDO<<")).append("\n");
-
-		    for (Producto item : itemsPedido) {
-		    	factura.append(item.generarTextoFactura());
-		    	}
-		
-		    int maxWidth = 24;
-		    factura.append(String.format("%-" + (maxWidth - 5) + "s$%.2f\n", "SUBTOTAL:", getPrecioNetoPedido()));
-		    factura.append(String.format("%-" + (maxWidth - 3) + "s$%.2f\n", "IVA:", getPrecioIVAPedido()));
-		    factura.append("============");
-		    factura.append(String.format("%-" + (maxWidth - 5) + "s$%.2f\n", "TOTAL:", getPrecioTotalPedido()));
-
+		    LocalTime hora = java.time.LocalTime.now();
+		    DateTimeFormatter formatHora = DateTimeFormatter.ofPattern("HH:mm:ss");
+		    
+		    //Header
+		    factura.append("\n\n\n Cliente: " + nombreCliente);
+		    factura.append("\n Dirección: " + direccionCliente);
+		    factura.append("\n\n ---------------------------------------");
+		    factura.append("\n Orden No. 00" + numeroPedidos + "\t\t\t" + hora.format(formatHora)); 
+		    factura.append("\n ---------------------------------------");
+		    
+		    //Items
+		    factura.append(String.format("%-40s\n","\n\n ITEM"));
+		    for (Producto itemPedido : itemsPedido) {
+		    	factura.append(itemPedido.generarTextoFactura());
+		    }
+		    
+		    
+		    //Footer
+		    factura.append("\n ---------------------------------------\n\n");
+		    
+		    //Neto
+		    String formatNeto = "%-35s%-10s\n";
+		    String precioNeto = String.valueOf(getPrecioNetoPedido());
+		    if (precioNeto.length() == 4) {
+				formatNeto = "%-36s%-10s\n"; 
+			}
+			else if (formatNeto.length() == 6) {
+				formatNeto = "%-34s%-10s\n";
+			}
+		    factura.append(String.format(formatNeto," Subtotal", precioNeto));
+		    
+		    //IVA
+		    String formatIVA = "%-35s%-10s\n";
+		    String IVA = String.valueOf(getPrecioIVAPedido());
+		    if (IVA.length() == 4) {
+				formatIVA = "%-36s%-10s\n"; 
+			}
+			else if (IVA.length() == 6) {
+				formatIVA = "%-34s%-10s\n";
+			}
+		    factura.append(String.format(formatIVA," IVA 19%", IVA));
+		    
+		    //Total
+		    String formatTotal = "%-35s%-10s\n";
+		    String precioTotal = String.valueOf(getPrecioTotalPedido());
+		    if (precioTotal.length() == 4) {
+				formatTotal = "%-36s%-10s\n"; 
+			}
+			else if (precioTotal.length() == 6) {
+				formatTotal = "%-34s%-10s\n";
+			}
+		    factura.append(String.format(formatTotal," Total", precioTotal));
+		    
+		    factura.append(String.format("\n\n%-10s%-10s","","Gracias por tu compra"));
+		    
 		    return factura.toString();
-		}
+	}
 
 	public void guardarFactura(File archivo) {
 	
-		try {
-            FileWriter fw = new FileWriter(archivo);
-            BufferedWriter bw = new BufferedWriter(fw);
-            
-            bw.write(generarTextoFactura());
-            bw.close();
-
-            System.out.println("\nSu factura se ha guardado con éxito.\n");
-        } 
-		catch (IOException e) {
-            e.printStackTrace();
-        }
+		////////
     }
 	
 	

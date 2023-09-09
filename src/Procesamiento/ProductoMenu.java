@@ -10,7 +10,7 @@ public class ProductoMenu implements Producto {
 		this.nombre = nombre;
 		this.precioBase = precioBase;
 	}
-	
+
 	@Override
 	public String getNombre() {
 		return nombre;
@@ -24,18 +24,23 @@ public class ProductoMenu implements Producto {
 	@Override
 	public String generarTextoFactura() {
 		StringBuilder factura = new StringBuilder();
+
 		String nombreProducto = getNombre();
-		factura.append(nombreProducto).append("\n");
-		int maxWidth = 24;
-		
-		String precioProducto = String.format("$%.2f", getPrecio());
-		String productoln = String.format("%=" + (maxWidth + 3) + "s\n", nombreProducto, precioProducto);
-		factura.append(productoln);
+		String precioProducto = String.valueOf(getPrecio());
+
+		String format = "%-35s%-10s\n";
+
+		if (precioProducto.length() == 4) {
+			format = "%-36s%-10s\n";
+		}
+		else if (precioProducto.length() == 6) {
+			format = "%-34s%-10s\n";
+		}
+
+		factura.append(String.format(format, " 1 " + nombreProducto, precioProducto));
+
 		return factura.toString();
+
 	}
-	
+
 }
-	
-
-
-
